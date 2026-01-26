@@ -17,3 +17,10 @@ MonoBehaviour:
   _springRestLength: 0.8
   _springStrength: 1200
   _springDamper: 75
+  _steerAngle: 20
+  _frontWheelsGripFactor: 0.8
+  _backWheelsGripFactor: 0.9
+  _tireMass: 1
+  _acceleratepower: 300
+  _maxForwardSpeed: 22
+  _maxBackwardSpeed: 12
