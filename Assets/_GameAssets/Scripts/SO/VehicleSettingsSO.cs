@@ -18,10 +18,16 @@ public class VehicleSettingsSO : ScriptableObject
     [SerializeField] private float _backWheelsGripFactor;
     [Header("Body Settings")]
     [SerializeField] private float _tireMass;
+
+    
     [Header("Power Settings")]
     [SerializeField] private float _acceleratepower;
     [SerializeField] private float _maxForwardSpeed;
     [SerializeField] private float _maxBackwardSpeed;
+    [SerializeField] private float _brakesPower;
+    [Header("Air Resistance")]
+    [SerializeField] private float _airResistance;
+
     public float WheelPaddingX => _wheelPaddingX;
     public float WheelPaddingZ => _wheelPaddingZ;
     public float SpringRestLength => _springRestLength;
@@ -34,5 +40,7 @@ public class VehicleSettingsSO : ScriptableObject
     public float AcceleratePower => _acceleratepower;
     public float MaxForwardSpeed => _maxForwardSpeed;
     public float MaxBackwardSpeed => _maxBackwardSpeed;
+    public float BrakesPower => _brakesPower;
+    public float AirResistance => _airResistance;
 
 }

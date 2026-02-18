@@ -1,6 +1,6 @@
 using System;
 using System.Collections.Generic;
-
+using Unity.VisualScripting;
 using UnityEngine;
 
 
@@ -19,12 +19,22 @@ public class PlayerVehicleController : MonoBehaviour
         WheelType.BackLeft,
         WheelType.BackRight,
     };
+    private static readonly WheelType[] _backWheels = new WheelType[]
+    {
+        WheelType.BackLeft,
+        WheelType.BackRight,
+    };
 
     [Header("References")]
 
     [SerializeField] private VehicleSettingsSO vehicleSettings;
     [SerializeField] private Rigidbody vehicleRigidbody;
     [SerializeField] private BoxCollider vehicleCollider;
+
+    public VehicleSettingsSO Settings => vehicleSettings;
+
+    public Vector3 Velocity => vehicleRigidbody.linearVelocity;
+    public Vector3 Forward => transform.forward; 
     private float _steerInput;
     private float _accelerateInput;
 
@@ -49,6 +59,8 @@ public class PlayerVehicleController : MonoBehaviour
         UpdateSuspension();
         UpdateSteering();
         UpdateAcceleration();
+        UpdateBrakes();
+        UpdateAirResistance();
     }
 
     private void SetSteerInput(float steerInput)
@@ -126,6 +138,57 @@ public class PlayerVehicleController : MonoBehaviour
             vehicleRigidbody.AddForceAtPosition(wheelForward * _accelerateInput * vehicleSettings.AcceleratePower, position);
 
         }
+    }
+    private void UpdateBrakes()
+    {
+        float forwardSpeed = Vector3.Dot(transform.forward,vehicleRigidbody.linearVelocity);
+        float speed = Mathf.Abs(forwardSpeed);
+        float brakesRatio;
+
+        const float ALMOST_STOPPING_SPEED = 2f;
+        bool _almostStopping = speed < ALMOST_STOPPING_SPEED;
+
+        if (_almostStopping)
+        {
+            brakesRatio = 1f;
+        }
+        else
+        {
+         bool accelerateContrary = !Mathf.Approximately(_accelerateInput, 0f) &&
+          Vector3.Dot(transform.forward, vehicleRigidbody.linearVelocity) * _accelerateInput < 0f;
+
+            if (accelerateContrary)
+            {
+                brakesRatio = 1f;
+            }
+            else if(Mathf.Approximately(_accelerateInput, 0f))
+            {
+                brakesRatio = 0.1f;
+            }
+            else
+            {
+                return;
+            }
+        }
+
+        foreach (WheelType wheel in _backWheels)
+        {
+            Vector3 springposition = GetSpringPosition(wheel);
+            Vector3 rollDirection = GetWheelRollDirection(wheel);
+            float rollVelocity = Vector3.Dot(rollDirection, vehicleRigidbody.GetPointVelocity(springposition));
+
+            float desiredChangevelocity = -rollVelocity * brakesRatio * vehicleSettings.BrakesPower;
+            float desiredAcceleration = desiredChangevelocity / Time.fixedDeltaTime;
+
+            Vector3 force = desiredAcceleration * rollDirection * vehicleSettings.TireMass;
+            vehicleRigidbody.AddForceAtPosition(force, GetTorquePosition(wheel));
+        }
+
+        
+    }
+    private void UpdateAirResistance()
+    {
+        vehicleRigidbody.AddForce(-vehicleRigidbody.linearVelocity * vehicleCollider.size.magnitude * vehicleSettings.AirResistance);
     }
 
     private void CastSpring(WheelType wheelType)
@@ -218,6 +281,10 @@ public class PlayerVehicleController : MonoBehaviour
     private bool IsGrounded(WheelType wheelType)
     {
         return _springDatas[wheelType]._currentLength < vehicleSettings.SpringRestLength;
+    }
+    public float GetSpringCurrentLenght(WheelType wheelType)
+    {
+        return _springDatas[wheelType]._currentLength;
     }
 
 

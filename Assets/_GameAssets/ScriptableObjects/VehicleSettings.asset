@@ -24,3 +24,5 @@ MonoBehaviour:
   _acceleratepower: 300
   _maxForwardSpeed: 22
   _maxBackwardSpeed: 12
+  _brakesPower: 1.5
+  _airResistance: 5
