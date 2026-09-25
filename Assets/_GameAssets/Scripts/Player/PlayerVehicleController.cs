@@ -1,10 +1,11 @@
 using System;
 using System.Collections.Generic;
+using Unity.Netcode;
 using Unity.VisualScripting;
 using UnityEngine;
 
 
-public class PlayerVehicleController : MonoBehaviour
+public class PlayerVehicleController : NetworkBehaviour
 {
     public class SpringData
     {
@@ -49,13 +50,33 @@ public class PlayerVehicleController : MonoBehaviour
         }
 
     }
+
+    public override void OnNetworkSpawn()
+    {
+        vehicleRigidbody.isKinematic = true;
+        SetOwnerRigidbodyKinematicAsync();
+    }
+
+    private void SetOwnerRigidbodyKinematicAsync()
+    {
+        
+    }
+
     private void Update()
     {
+        if (!IsOwner)
+        {
+            return;
+        }
         SetSteerInput(Input.GetAxis("Horizontal"));
         SetAcclerateInput(Input.GetAxis("Vertical"));
     }
     private void FixedUpdate()
     {
+        if (!IsOwner)
+        {
+            return;
+        }
         UpdateSuspension();
         UpdateSteering();
         UpdateAcceleration();

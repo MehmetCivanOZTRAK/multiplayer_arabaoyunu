@@ -1,9 +1,10 @@
 using System.Collections.Generic;
+using Unity.Netcode;
 using Unity.Services.Lobbies.Models;
 using UnityEngine;
 using UnityEngine.UIElements;
 
-public class PlayerVehicleVisiualController : MonoBehaviour
+public class PlayerVehicleVisiualController : NetworkBehaviour
 {
     [SerializeField] private PlayerVehicleController _playerVehicleController;
     [SerializeField] private Transform _wheelFL, _wheelFR, _wheelBL, _wheelBR;
@@ -26,6 +27,10 @@ public class PlayerVehicleVisiualController : MonoBehaviour
 
     private void Update()
     {
+        if (!IsOwner)
+        {
+            return;
+        }
         UpdateVisiualStates();
         RotateWheels();
         SetSuspension();
