@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using Unity.Netcode;
+using Cysharp.Threading.Tasks;
 using Unity.VisualScripting;
 using UnityEngine;
 
@@ -57,9 +58,13 @@ public class PlayerVehicleController : NetworkBehaviour
         SetOwnerRigidbodyKinematicAsync();
     }
 
-    private void SetOwnerRigidbodyKinematicAsync()
+    private async void SetOwnerRigidbodyKinematicAsync()
     {
-        
+        if (IsOwner)
+        {
+            await UniTask.DelayFrame(1);
+            vehicleRigidbody.isKinematic = false;
+        } 
     }
 
     private void Update()
