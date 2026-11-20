@@ -8,7 +8,7 @@ public class PlayerNetworkController : NetworkBehaviour
 
     [SerializeField] private CinemachineCamera _playerCamera;
     
-
+    
     public override void OnNetworkSpawn()
     {
         _playerCamera.gameObject.SetActive(IsOwner);
